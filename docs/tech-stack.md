@@ -9,3 +9,4 @@
 - Design Style: Single-Layer Minimalism (dark-first)
 - Local Dev Bootstrap: Bash scripts (`scripts/setup-local.sh`, `scripts/setup-check.sh`)
 - Scheduling: per-playlist playback speed aware planning (`1x`, `1.5x`, `1.75x`, `2x`)
+- Deployment: Fly.io (Dockerfile + `fly.toml`)

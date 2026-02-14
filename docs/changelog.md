@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-02-14 - Fly.io deployment
+### Added
+- Docker-based Fly.io deployment artifacts with `yt-dlp` installed in the image.
+
 ## 2026-02-14
 - Bootstrapped repository docs and AGENTS configuration.
 - Added Next.js app scaffold and shadcn/ui setup.

@@ -1,5 +1,7 @@
 # Project Status
 
+Last Updated: 2026-02-14 - Added Fly.io deployment artifacts.
+
 ## Current Progress
 - Implemented full MVP web app:
 - Next.js + TypeScript + shadcn/ui setup completed.
@@ -19,9 +21,10 @@
 - Added multiline parser utility and unit tests (`parsePlaylistIdsFromMultiline`).
 - Unit tests added and passing (`lib/*.test.ts`).
 - Validation complete: `pnpm lint`, `pnpm test`, `pnpm build`.
+- Added Fly.io deployment artifacts (`Dockerfile`, `.dockerignore`, `fly.toml`) with `yt-dlp` installed in image.
 
 ## Blockers / Bugs
-- Requires `yt-dlp` binary installed on server/runtime to import playlists.
+- Requires `yt-dlp` binary available in the runtime environment to import playlists.
 
 ## Next Immediate Starting Point
 - Add optional capped concurrency for large batch imports and improve per-item failure visibility in UI.

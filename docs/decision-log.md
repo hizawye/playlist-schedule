@@ -1,5 +1,12 @@
 # Decision Log
 
+## 2026-02-14 - Fly.io deployment
+**Context:** Need a low-cost paid hosting option that can run `yt-dlp` and the Next.js server.
+**Decision:** Use Fly.io with a Docker-based deploy and install `yt-dlp` in the image.
+**Rationale:** Fly.io provides low monthly cost, supports custom Docker images, and runs the required binary.
+**Consequences:** Deployment is container-based; the app runs on a small VM with auto start/stop behavior.
+**Alternatives Considered:** DigitalOcean Droplet, Hetzner Cloud VM.
+
 ## 2026-02-14
 - Initialized Codex agent environment (`git init`, `pnpm init`, docs scaffold, AGENTS.md bootstrap).
 - Selected `pnpm` as package manager baseline for all setup and scripts.

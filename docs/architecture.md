@@ -6,6 +6,7 @@
 - Data source: server-side `yt-dlp` via API route (`app/api/youtube/playlist/route.ts`).
 - Persistence: Browser localStorage (single-user local state).
 - Local bootstrap: `scripts/setup-local.sh` for machine provisioning and project initialization.
+- Deployment: Fly.io using Dockerfile with `yt-dlp` installed in the image.
 
 ## Runtime Flow
 1. User adds playlist URL/ID on dashboard.
@@ -26,3 +27,5 @@
 - `components/video-table.tsx`: Sort/filter table and completion toggles.
 - `scripts/setup-local.sh`: installs missing system deps + project deps + validations.
 - `scripts/setup-check.sh`: validates local runtime prerequisites.
+- `Dockerfile`: production build + runtime image with `yt-dlp`.
+- `fly.toml`: Fly.io app configuration (region, ports, VM sizing).
