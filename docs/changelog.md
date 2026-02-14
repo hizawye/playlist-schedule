@@ -3,6 +3,7 @@
 ## 2026-02-14 - Fly.io deployment
 ### Added
 - Docker-based Fly.io deployment artifacts with `yt-dlp` installed in the image.
+- README deployment section with Fly.io steps.
 
 ## 2026-02-14
 - Bootstrapped repository docs and AGENTS configuration.

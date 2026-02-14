@@ -93,3 +93,37 @@ pnpm setup:check
 - If `yt-dlp` still not found after setup, set `YTDLP_PATH` in `.env.local` to its absolute path.
 - If playlist extraction is incomplete, lower `YTDLP_MIN_DURATION_COVERAGE_PCT` or increase `YTDLP_FALLBACK_TIMEOUT_MS`.
 - If corporate proxy blocks installer URLs, manually install `node`, `pnpm`, and `yt-dlp`, then run `pnpm install`.
+
+## Deployment (Fly.io)
+
+Prereqs:
+- `flyctl` installed and authenticated.
+- A unique app name.
+
+1. Create and configure the app (region `fra`):
+
+```bash
+fly launch --region fra --no-deploy
+```
+
+2. If the app name is taken, update it in `fly.toml`:
+
+```toml
+app = "your-unique-app"
+```
+
+3. Deploy:
+
+```bash
+fly deploy
+```
+
+4. Open the app:
+
+```bash
+fly open
+```
+
+Notes:
+- The Docker image installs `yt-dlp`, so playlist import works without extra setup.
+- For private/restricted playlists, set `YTDLP_COOKIES_FILE` as a Fly secret and mount the file.

@@ -1,6 +1,6 @@
 # Project Status
 
-Last Updated: 2026-02-14 - Added Fly.io deployment artifacts.
+Last Updated: 2026-02-14 - Added Fly.io deployment section to README.
 
 ## Current Progress
 - Implemented full MVP web app:
@@ -22,6 +22,7 @@ Last Updated: 2026-02-14 - Added Fly.io deployment artifacts.
 - Unit tests added and passing (`lib/*.test.ts`).
 - Validation complete: `pnpm lint`, `pnpm test`, `pnpm build`.
 - Added Fly.io deployment artifacts (`Dockerfile`, `.dockerignore`, `fly.toml`) with `yt-dlp` installed in image.
+- Added Fly.io deployment section to README.
 
 ## Blockers / Bugs
 - Requires `yt-dlp` binary available in the runtime environment to import playlists.
