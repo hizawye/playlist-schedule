@@ -14,6 +14,9 @@
 - Added pace-aware schedule controls and calculations (1x, 1.5x, 1.75x, 2x) per playlist.
 - Updated remaining schedule recomputation to start from today after videos are marked watched.
 - Fixed hydration mismatch on dashboard by replacing first-render localStorage initialization with `useSyncExternalStore` subscription.
+- Added multiline playlist import support (one URL/ID per line) in dashboard form.
+- Implemented batch import flow with partial success summary, invalid-line accounting, and skip-existing duplicate behavior.
+- Added multiline parser utility and unit tests (`parsePlaylistIdsFromMultiline`).
 - Unit tests added and passing (`lib/*.test.ts`).
 - Validation complete: `pnpm lint`, `pnpm test`, `pnpm build`.
 
@@ -21,4 +24,4 @@
 - Requires `yt-dlp` binary installed on server/runtime to import playlists.
 
 ## Next Immediate Starting Point
-- Validate pace-aware timeline/table UX polish on mobile and add inline helper copy if needed.
+- Add optional capped concurrency for large batch imports and improve per-item failure visibility in UI.

@@ -1,0 +1,95 @@
+# Playlist Schedule
+
+Web app to:
+- Import one or more YouTube playlists (one link/ID per line) from server-side `yt-dlp`.
+- Calculate total playlist duration and per-video watch time.
+- Auto-build daily watch schedule from minutes per day.
+- Apply playback pace (`1x`, `1.5x`, `1.75x`, `2x`) to compute effective watch time left.
+- Predict end date.
+- Track completion per video.
+
+## Quick Setup (Local + Cloned Devices)
+
+Run one command from repo root:
+
+```bash
+./scripts/setup-local.sh
+```
+
+Or:
+
+```bash
+pnpm setup
+```
+
+This script will:
+- Install missing system deps (`node`, `pnpm`, `yt-dlp`) on Linux/macOS.
+- Create `.env.local` from `.env.example` if missing.
+- Install project deps with `pnpm install`.
+- Run environment checks, lint, and tests.
+- Use fast `yt-dlp` flat-playlist extraction with automatic full fallback when metadata quality is low.
+
+## Manual Setup
+
+1. Install dependencies:
+
+```bash
+pnpm install
+```
+
+2. Add env file:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Make sure `yt-dlp` is installed and reachable:
+
+```bash
+yt-dlp --version
+```
+
+4. Configure `.env.local` if needed:
+
+```bash
+YTDLP_PATH=yt-dlp
+YTDLP_TIMEOUT_MS=30000
+YTDLP_FALLBACK_TIMEOUT_MS=90000
+YTDLP_MIN_DURATION_COVERAGE_PCT=80
+```
+
+5. Start app:
+
+```bash
+pnpm dev
+```
+
+## Setup Check Only
+
+```bash
+pnpm setup:check
+```
+
+## Scripts
+
+- `pnpm setup` - bootstrap local machine and project.
+- `pnpm setup:check` - verify local environment requirements only.
+- `pnpm dev` - run dev server.
+- `pnpm build` - production build.
+- `pnpm start` - run built app.
+- `pnpm lint` - lint checks.
+- `pnpm test` - run unit tests.
+
+## Notes
+
+- Persistence is local browser storage (`localStorage`).
+- No OAuth in MVP.
+- For restricted content, provide `YTDLP_COOKIES_FILE` and ensure your cookies are valid.
+- Remaining schedule automatically re-plans from today based on watched videos and selected pace.
+
+## Troubleshooting
+
+- If `sudo` fails, rerun script with a user that has sudo access.
+- If `yt-dlp` still not found after setup, set `YTDLP_PATH` in `.env.local` to its absolute path.
+- If playlist extraction is incomplete, lower `YTDLP_MIN_DURATION_COVERAGE_PCT` or increase `YTDLP_FALLBACK_TIMEOUT_MS`.
+- If corporate proxy blocks installer URLs, manually install `node`, `pnpm`, and `yt-dlp`, then run `pnpm install`.

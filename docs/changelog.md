@@ -14,3 +14,5 @@
 - Updated scheduler to re-plan remaining videos from today when progress changes.
 - Fixed hydration mismatch on `/` by aligning server/client first render and moving persisted playlist sync to a hydration-safe store subscription.
 - Fixed `useSyncExternalStore` snapshot caching on dashboard to avoid infinite loop warnings.
+- Added multiline playlist input support to import multiple playlists in one submit (one URL/ID per line).
+- Added batch-import summary behavior: partial success, invalid-line reporting, and skip-existing duplicates.

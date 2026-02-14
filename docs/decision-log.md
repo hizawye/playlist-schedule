@@ -16,3 +16,5 @@
 - Updated remaining-plan behavior to reschedule from today after watched progress updates.
 - Fixed dashboard hydration mismatch by making initial render deterministic and subscribing to localStorage changes via `useSyncExternalStore`.
 - Stabilized `useSyncExternalStore` snapshots by caching server/client snapshot references to prevent infinite re-render loops.
+- Added multiline playlist batch import (one URL/ID per line) with partial-success behavior and single-submit summary reporting.
+- Chose duplicate handling for batch import to skip already tracked playlist IDs instead of overwriting existing state.
