@@ -1,0 +1,25 @@
+app = "playlist-schedule"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  YTDLP_PATH = "yt-dlp"
+  YTDLP_TIMEOUT_MS = "30000"
+  YTDLP_FALLBACK_TIMEOUT_MS = "90000"
+  YTDLP_MAX_BUFFER_BYTES = "26214400"
+  YTDLP_MIN_DURATION_COVERAGE_PCT = "80"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_start_machines = true
+  auto_stop_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
