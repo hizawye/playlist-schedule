@@ -1,5 +1,12 @@
 # Decision Log
 
+## 2026-02-15 - Unified landing behavior at `/` with shared auth marketing UI
+**Context:** The product requirement is that `/` serves as the landing page for signed-out users and as the dashboard for signed-in users, while retaining NextAuth custom sign-in handling.
+**Decision:** Render a shared landing component at `/` when unauthenticated and reuse the same component on `/sign-in` for NextAuth page compatibility and error/callback handling.
+**Rationale:** Keeps route behavior aligned with product expectations without breaking auth provider redirects or callback flows.
+**Consequences:** Signed-out users now see landing content directly at `/`; `/sign-in` remains available as an auth entrypoint and displays the same UI.
+**Alternatives Considered:** Keep redirect-only flow from `/` to `/sign-in`.
+
 ## 2026-02-15 - NextAuth OAuth entrypoint must use POST/client signIn flow
 **Context:** Custom `/sign-in` page linked directly to `GET /api/auth/signin/google`, which redirected back with `error=google` and blocked login.
 **Decision:** Replace direct link with a client component that calls `signIn("google", { callbackUrl: "/" })`.

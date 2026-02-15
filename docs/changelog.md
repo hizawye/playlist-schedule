@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-02-15 - Responsive landing and dashboard redesign
+### Added
+- New shared landing component for unauthenticated entry experience with hero, value sections, and workflow steps.
+- Auth error messaging on landing for OAuth callback failures.
+- Mobile playlist card layout for signed-in dashboard (`lg:hidden`) while keeping desktop table view (`lg:block`).
+
+### Changed
+- Updated `/` behavior to render landing for signed-out users and dashboard for signed-in users.
+- Reused the same landing UI on `/sign-in` for NextAuth custom sign-in compatibility.
+- Improved add-playlist form mobile ergonomics (layout spacing, full-width submit CTA on small screens).
+- Updated global visual tokens and focus-visible styles for clearer responsive presentation and accessibility.
+
 ## 2026-02-15 - Google sign-in flow fix
 ### Fixed
 - Replaced direct `GET /api/auth/signin/google` link with client-side NextAuth `signIn("google")` flow.
