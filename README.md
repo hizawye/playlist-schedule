@@ -118,7 +118,16 @@ app = "your-unique-app"
 fly deploy
 ```
 
-4. Open the app:
+4. Verify listener and health:
+
+```bash
+fly logs -a your-unique-app
+fly status -a your-unique-app
+```
+
+Expected startup logs should show `0.0.0.0:8080` as the listener.
+
+5. Open the app:
 
 ```bash
 fly open
@@ -127,3 +136,5 @@ fly open
 Notes:
 - The Docker image installs `yt-dlp`, so playlist import works without extra setup.
 - For private/restricted playlists, set `YTDLP_COOKIES_FILE` as a Fly secret and mount the file.
+- This project standardizes on port `8080` for Fly runtime (`fly.toml` `internal_port`, Docker `PORT`, and `next start`).
+- If Fly reports `instance refused connection`, confirm all three port settings are still `8080` and redeploy.

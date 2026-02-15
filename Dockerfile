@@ -12,7 +12,7 @@ RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o 
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 
 # Install dependencies
@@ -27,6 +27,6 @@ COPY . .
 # Build
 RUN pnpm build
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["pnpm", "start"]
