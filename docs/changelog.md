@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-02-15 - Google sign-in flow fix
+### Fixed
+- Replaced direct `GET /api/auth/signin/google` link with client-side NextAuth `signIn("google")` flow.
+- Resolved `/sign-in?...&error=google` loop and restored redirect to Google OAuth consent endpoint.
+
+## 2026-02-15 - Supabase Postgres cutover plan
+### Changed
+- Switched production DB hosting guidance from Fly Postgres to Supabase Postgres.
+- Updated Fly release command to use `DIRECT_DATABASE_URL` for migrations when available, with fallback to `DATABASE_URL`.
+- Updated `.env.example`, README, and docs runbooks for Supabase pooler/direct URL secret setup.
+
+## 2026-02-15 - Database + Auth rollout
+### Added
+- PostgreSQL persistence via Prisma with initial migration schema.
+- NextAuth Google OAuth integration with database sessions.
+- Sign-in page and authenticated page/API guards.
+- Playlist repository and API routes for list/import/config/progress/refresh/delete.
+- One-time localStorage migration endpoint with idempotency key support.
+- Fly release migration command (`pnpm db:migrate`).
+- Unit tests for migration-key determinism and contract schema validation.
+
+### Changed
+- Dashboard/detail data flow migrated from localStorage to authenticated APIs.
+- README and env templates updated for DB/auth/Fly deployment.
+- Build pipeline now generates Prisma client before Next build.
+
 ## 2026-02-15 - Fly port mismatch hotfix
 ### Changed
 - Standardized production listener to `0.0.0.0:8080` across Fly service config, Docker image defaults, and runtime start command.
