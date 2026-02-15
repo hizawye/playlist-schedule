@@ -256,29 +256,32 @@ export function DashboardClient({ userDisplayName }: DashboardClientProps) {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-6 py-10 sm:px-10 lg:px-16">
-      <div className="pointer-events-none absolute top-[-140px] left-[-160px] size-[420px] rounded-full bg-cyan-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute right-[-160px] bottom-[-160px] size-[420px] rounded-full bg-orange-400/20 blur-3xl" />
-      <div className="relative mx-auto max-w-6xl space-y-10">
-        <section className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <Badge variant="outline">YouTube Watch Planner</Badge>
+    <main className="relative min-h-screen overflow-hidden px-6 py-8 sm:px-10 sm:py-10 lg:px-16">
+      <div className="pointer-events-none absolute top-[-170px] left-[-180px] size-[460px] rounded-full bg-cyan-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute right-[-190px] bottom-[-190px] size-[460px] rounded-full bg-orange-400/20 blur-3xl" />
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-10 sm:gap-12">
+        <section className="space-y-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-3">
+              <Badge variant="outline">YouTube Watch Planner</Badge>
+              <h1 className="max-w-3xl text-balance text-3xl leading-tight font-semibold tracking-[-0.02em] sm:text-5xl">
+                Turn any playlist into a daily watch plan you can actually keep.
+              </h1>
+              <p className="text-muted-foreground max-w-[64ch] text-sm leading-relaxed sm:text-base">
+                Signed in as {userDisplayName}. Add playlists, tune your watch pace,
+                and keep completion dates updated as your progress changes.
+              </p>
+            </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => void signOut({ callbackUrl: "/sign-in" })}
+              className="self-start"
+              onClick={() => void signOut({ callbackUrl: "/" })}
             >
               <LogOut />
               Sign out
             </Button>
           </div>
-          <h1 className="max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
-            Plan playlist watch time, daily load, completion date, and progress.
-          </h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Signed in as {userDisplayName}. Import any public playlist, set your
-            minutes per day, and track each video as you finish it.
-          </p>
           {isMigratingLocalState ? (
             <p className="text-muted-foreground text-sm">
               Migrating local playlist data into your account...
@@ -287,12 +290,22 @@ export function DashboardClient({ userDisplayName }: DashboardClientProps) {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Add Playlist</h2>
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold sm:text-2xl">Add Playlist</h2>
+            <p className="text-muted-foreground text-sm">
+              Paste one playlist per line to import and generate schedule projections.
+            </p>
+          </div>
           <AddPlaylistForm onSubmit={handleAddPlaylists} />
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Tracked Playlists</h2>
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold sm:text-2xl">Tracked Playlists</h2>
+            <p className="text-muted-foreground text-sm">
+              View progress, remaining watch time, and projected finish dates.
+            </p>
+          </div>
           {isLoading ? (
             <p className="text-muted-foreground text-sm">Loading account playlists...</p>
           ) : playlists.length === 0 ? (
@@ -300,82 +313,179 @@ export function DashboardClient({ userDisplayName }: DashboardClientProps) {
               No playlists added yet. Import one above to create a watch schedule.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Playlist</TableHead>
-                  <TableHead>Videos</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Remaining</TableHead>
-                  <TableHead>Pace</TableHead>
-                  <TableHead>Per Day</TableHead>
-                  <TableHead>Projected End</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              <div className="space-y-4 lg:hidden">
                 {playlists.map(({ playlistState, schedule }) => (
-                  <TableRow key={playlistState.snapshot.playlistId}>
-                    <TableCell className="space-y-1">
-                      <p className="font-medium">{playlistState.snapshot.title}</p>
-                      <p className="text-muted-foreground text-xs">
+                  <article
+                    key={playlistState.snapshot.playlistId}
+                    className="space-y-4 rounded-xl border border-border/70 bg-background/50 p-4 backdrop-blur-sm"
+                  >
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold leading-snug break-words">
+                        {playlistState.snapshot.title}
+                      </p>
+                      <p className="text-muted-foreground text-xs break-words">
                         {playlistState.snapshot.channelTitle}
                       </p>
-                    </TableCell>
-                    <TableCell>
-                      {schedule.completedVideos}/{schedule.totalVideos}
-                    </TableCell>
-                    <TableCell>{formatDurationCompact(schedule.totalDurationSec)}</TableCell>
-                    <TableCell>
-                      {formatDurationCompact(schedule.remainingAdjustedDurationSec)}
-                    </TableCell>
-                    <TableCell>{playlistState.planConfig.playbackSpeed}x</TableCell>
-                    <TableCell>{playlistState.planConfig.minutesPerDay}m</TableCell>
-                    <TableCell>
-                      {schedule.endDate ? formatShortDate(schedule.endDate) : "Done"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end gap-2">
-                        <Button asChild size="sm" variant="outline">
-                          <Link href={`/playlist/${playlistState.snapshot.playlistId}`}>
-                            Open
-                            <ExternalLink />
-                          </Link>
-                        </Button>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button size="icon-sm" variant="ghost" aria-label="Delete">
-                              <Trash2 />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Remove playlist?</DialogTitle>
-                              <DialogDescription>
-                                This removes the playlist from your account, including
-                                schedule and progress data.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <Button
-                                variant="destructive"
-                                onClick={() =>
-                                  void handleRemovePlaylist(
-                                    playlistState.snapshot.playlistId
-                                  )
-                                }
-                              >
-                                Remove
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
+                    </div>
+                    <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
+                      <div className="space-y-1">
+                        <dt className="text-muted-foreground">Progress</dt>
+                        <dd className="font-medium">
+                          {schedule.completedVideos}/{schedule.totalVideos}
+                        </dd>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                      <div className="space-y-1">
+                        <dt className="text-muted-foreground">Total</dt>
+                        <dd className="font-medium">
+                          {formatDurationCompact(schedule.totalDurationSec)}
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="text-muted-foreground">Remaining</dt>
+                        <dd className="font-medium">
+                          {formatDurationCompact(schedule.remainingAdjustedDurationSec)}
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="text-muted-foreground">Projected End</dt>
+                        <dd className="font-medium">
+                          {schedule.endDate ? formatShortDate(schedule.endDate) : "Done"}
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="text-muted-foreground">Speed</dt>
+                        <dd className="font-medium">
+                          {playlistState.planConfig.playbackSpeed}x
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="text-muted-foreground">Per Day</dt>
+                        <dd className="font-medium">
+                          {playlistState.planConfig.minutesPerDay}m
+                        </dd>
+                      </div>
+                    </dl>
+                    <div className="flex items-center gap-2">
+                      <Button asChild className="flex-1" variant="outline">
+                        <Link href={`/playlist/${playlistState.snapshot.playlistId}`}>
+                          Open
+                          <ExternalLink />
+                        </Link>
+                      </Button>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button size="icon-sm" variant="ghost" aria-label="Delete">
+                            <Trash2 />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Remove playlist?</DialogTitle>
+                            <DialogDescription>
+                              This removes the playlist from your account, including
+                              schedule and progress data.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button
+                              variant="destructive"
+                              onClick={() =>
+                                void handleRemovePlaylist(
+                                  playlistState.snapshot.playlistId
+                                )
+                              }
+                            >
+                              Remove
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </article>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+              <div className="hidden lg:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Playlist</TableHead>
+                      <TableHead>Videos</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Remaining</TableHead>
+                      <TableHead>Pace</TableHead>
+                      <TableHead>Per Day</TableHead>
+                      <TableHead>Projected End</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {playlists.map(({ playlistState, schedule }) => (
+                      <TableRow key={playlistState.snapshot.playlistId}>
+                        <TableCell className="space-y-1">
+                          <p className="font-medium">{playlistState.snapshot.title}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {playlistState.snapshot.channelTitle}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          {schedule.completedVideos}/{schedule.totalVideos}
+                        </TableCell>
+                        <TableCell>
+                          {formatDurationCompact(schedule.totalDurationSec)}
+                        </TableCell>
+                        <TableCell>
+                          {formatDurationCompact(schedule.remainingAdjustedDurationSec)}
+                        </TableCell>
+                        <TableCell>{playlistState.planConfig.playbackSpeed}x</TableCell>
+                        <TableCell>{playlistState.planConfig.minutesPerDay}m</TableCell>
+                        <TableCell>
+                          {schedule.endDate ? formatShortDate(schedule.endDate) : "Done"}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-end gap-2">
+                            <Button asChild size="sm" variant="outline">
+                              <Link href={`/playlist/${playlistState.snapshot.playlistId}`}>
+                                Open
+                                <ExternalLink />
+                              </Link>
+                            </Button>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button size="icon-sm" variant="ghost" aria-label="Delete">
+                                  <Trash2 />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Remove playlist?</DialogTitle>
+                                  <DialogDescription>
+                                    This removes the playlist from your account, including
+                                    schedule and progress data.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button
+                                    variant="destructive"
+                                    onClick={() =>
+                                      void handleRemovePlaylist(
+                                        playlistState.snapshot.playlistId
+                                      )
+                                    }
+                                  >
+                                    Remove
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </section>
       </div>

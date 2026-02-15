@@ -51,6 +51,9 @@
   --font-space-grotesk: "Segoe UI", "Avenir Next", "Noto Sans", sans-serif;
   --font-jetbrains-mono: "SFMono-Regular", "Consolas", "Menlo", monospace;
   --radius: 0.625rem;
+  --page-max-width: 72rem;
+  --section-space: clamp(2.25rem, 5vw, 4.75rem);
+  --reading-measure: 64ch;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -95,7 +98,25 @@
   body {
     @apply bg-background text-foreground;
     background-image:
-      radial-gradient(circle at 8% 12%, rgba(56, 189, 248, 0.12), transparent 24%),
-      radial-gradient(circle at 92% 80%, rgba(251, 146, 60, 0.12), transparent 25%);
+      radial-gradient(circle at 9% 14%, rgba(56, 189, 248, 0.15), transparent 28%),
+      radial-gradient(circle at 90% 82%, rgba(251, 146, 60, 0.14), transparent 30%);
+    background-attachment: fixed;
+  }
+  :focus-visible {
+    @apply rounded-sm outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer utilities {
+  .page-shell {
+    max-width: var(--page-max-width);
+  }
+
+  .section-space {
+    margin-top: var(--section-space);
+  }
+
+  .text-measure {
+    max-width: var(--reading-measure);
   }
 }

@@ -22,7 +22,12 @@ export function GoogleSignInButton({ callbackUrl }: GoogleSignInButtonProps) {
   }
 
   return (
-    <Button size="lg" onClick={() => void handleSignIn()} disabled={isSubmitting}>
+    <Button
+      size="lg"
+      className="w-full sm:w-auto"
+      onClick={() => void handleSignIn()}
+      disabled={isSubmitting}
+    >
       Continue with Google
     </Button>
   );

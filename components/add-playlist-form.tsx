@@ -63,7 +63,7 @@ export function AddPlaylistForm({ onSubmit }: AddPlaylistFormProps) {
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <Label htmlFor="playlist-input">Playlist URLs or IDs</Label>
         <Textarea
@@ -74,19 +74,20 @@ export function AddPlaylistForm({ onSubmit }: AddPlaylistFormProps) {
             "https://www.youtube.com/playlist?list=PL1234567890abcdef",
             "PL0987654321abcdef",
           ].join("\n")}
-          rows={4}
+          rows={5}
           autoComplete="off"
         />
         <p className="text-muted-foreground text-xs">
           Paste one playlist link or ID per line.
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="minutes-per-day">Minutes Per Day</Label>
           <Input
             id="minutes-per-day"
             type="number"
+            inputMode="numeric"
             min={1}
             max={600}
             value={minutesPerDay}
@@ -120,7 +121,7 @@ export function AddPlaylistForm({ onSubmit }: AddPlaylistFormProps) {
           </Select>
         </div>
       </div>
-      <Button type="submit" disabled={submitDisabled}>
+      <Button type="submit" disabled={submitDisabled} className="w-full sm:w-auto">
         {isLoading ? <Loader2 className="animate-spin" /> : null}
         Import Playlists
       </Button>
