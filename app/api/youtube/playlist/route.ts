@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+import { getAuthUserId } from "@/lib/auth";
 import {
   fetchPlaylistSnapshotWithYtDlpDetailed,
   PlaylistUnavailableError,
@@ -17,6 +18,11 @@ const querySchema = z.object({
 export async function GET(request: NextRequest) {
   const startedAt = Date.now();
   try {
+    const userId = await getAuthUserId();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
     const parsed = querySchema.safeParse({
       playlistId: request.nextUrl.searchParams.get("playlistId"),
     });

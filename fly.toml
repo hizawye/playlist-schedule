@@ -8,6 +8,9 @@ primary_region = 'cdg'
 
 [build]
 
+[deploy]
+  release_command = 'sh -c "DATABASE_URL=${DIRECT_DATABASE_URL:-$DATABASE_URL} pnpm db:migrate"'
+
 [http_service]
   internal_port = 8080
   force_https = true

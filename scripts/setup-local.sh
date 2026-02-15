@@ -273,6 +273,11 @@ ensure_env_local() {
   append_if_missing "YTDLP_FALLBACK_TIMEOUT_MS" "90000"
   append_if_missing "YTDLP_MAX_BUFFER_BYTES" "26214400"
   append_if_missing "YTDLP_MIN_DURATION_COVERAGE_PCT" "80"
+  append_if_missing "DATABASE_URL" "postgresql://postgres:postgres@localhost:5432/playlist_schedule"
+  append_if_missing "AUTH_SECRET" "change-this-in-production"
+  append_if_missing "AUTH_GOOGLE_ID" ""
+  append_if_missing "AUTH_GOOGLE_SECRET" ""
+  append_if_missing "NEXTAUTH_URL" "http://localhost:3000"
 }
 
 append_if_missing() {

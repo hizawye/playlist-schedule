@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,34 +18,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  fetchPlaylist,
+  refreshPlaylist,
+  updatePlaylistConfig,
+  updatePlaylistProgress,
+} from "@/lib/client/playlists-api";
 import { formatDurationCompact, formatShortDate } from "@/lib/format";
 import { buildSchedule } from "@/lib/scheduler";
-import { loadPlaylistStates, savePlaylistStates } from "@/lib/storage";
-import {
-  PlaybackSpeed,
-  PlaylistSnapshot,
-  PlaylistState,
-  VideoProgress,
-} from "@/lib/types";
+import { PlaybackSpeed, PlaylistState } from "@/lib/types";
 
 interface PlaylistDetailClientProps {
   playlistId: string;
-}
-
-async function fetchPlaylistSnapshot(playlistId: string): Promise<PlaylistSnapshot> {
-  const response = await fetch(
-    `/api/youtube/playlist?playlistId=${encodeURIComponent(playlistId)}`
-  );
-  const payload = (await response.json()) as PlaylistSnapshot | { error: string };
-  if (!response.ok || "error" in payload) {
-    throw new Error("error" in payload ? payload.error : "Could not refresh playlist.");
-  }
-  return payload;
-}
-
-function getStateByPlaylistId(playlistId: string): PlaylistState | null {
-  const states = loadPlaylistStates();
-  return states[playlistId] ?? null;
 }
 
 function todayDateValue(): string {
@@ -53,9 +37,8 @@ function todayDateValue(): string {
 }
 
 export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClientProps) {
-  const [playlistState, setPlaylistState] = useState<PlaylistState | null>(() =>
-    getStateByPlaylistId(playlistId)
-  );
+  const [playlistState, setPlaylistState] = useState<PlaylistState | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const schedule = useMemo(() => {
@@ -88,73 +71,96 @@ export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClien
     }));
   }, [playlistState, schedule]);
 
-  function persist(nextPlaylistState: PlaylistState) {
-    const allStates = loadPlaylistStates();
-    allStates[playlistId] = nextPlaylistState;
-    savePlaylistStates(allStates);
-    setPlaylistState(nextPlaylistState);
-  }
+  useEffect(() => {
+    let isMounted = true;
 
-  function updatePlanConfig(patch: Partial<PlaylistState["planConfig"]>) {
+    async function loadPlaylist() {
+      try {
+        const playlist = await fetchPlaylist(playlistId);
+        if (!isMounted) {
+          return;
+        }
+        setPlaylistState(playlist);
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        const message =
+          error instanceof Error ? error.message : "Failed to load playlist.";
+
+        if (message.toLowerCase().includes("not found")) {
+          setPlaylistState(null);
+        } else {
+          toast.error(message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadPlaylist();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [playlistId]);
+
+  async function applyConfigPatch(patch: Partial<PlaylistState["planConfig"]>) {
     if (!playlistState) {
       return;
     }
-    persist({
-      ...playlistState,
-      planConfig: {
-        ...playlistState.planConfig,
-        ...patch,
-      },
-      updatedAt: new Date().toISOString(),
-    });
+
+    try {
+      const next = await updatePlaylistConfig(playlistId, patch);
+      setPlaylistState(next);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update plan settings.";
+      toast.error(message);
+    }
   }
 
-  function toggleCompletion(videoId: string, completed: boolean) {
+  async function toggleCompletion(videoId: string, completed: boolean) {
     if (!playlistState) {
       return;
     }
 
-    const current = playlistState.progressMap[videoId] ?? { completed: false };
-    const nextProgress: VideoProgress = completed
-      ? { completed: true, completedAt: new Date().toISOString() }
-      : { completed: false };
-
-    persist({
+    const optimistic: PlaylistState = {
       ...playlistState,
       progressMap: {
         ...playlistState.progressMap,
-        [videoId]:
-          current.completed === nextProgress.completed &&
-          current.completedAt === nextProgress.completedAt
-            ? current
-            : nextProgress,
+        [videoId]: completed
+          ? { completed: true, completedAt: new Date().toISOString() }
+          : { completed: false },
       },
       updatedAt: new Date().toISOString(),
-    });
+    };
+
+    setPlaylistState(optimistic);
+
+    try {
+      const next = await updatePlaylistProgress(playlistId, videoId, completed);
+      setPlaylistState(next);
+    } catch (error) {
+      setPlaylistState(playlistState);
+      const message =
+        error instanceof Error ? error.message : "Failed to update progress.";
+      toast.error(message);
+    }
   }
 
-  async function refreshPlaylist() {
+  async function handleRefreshPlaylist() {
     if (!playlistState) {
       return;
     }
 
     try {
       setIsRefreshing(true);
-      const snapshot = await fetchPlaylistSnapshot(playlistId);
-      const nextProgressMap: Record<string, VideoProgress> = {};
-
-      for (const video of snapshot.videos) {
-        if (playlistState.progressMap[video.videoId]) {
-          nextProgressMap[video.videoId] = playlistState.progressMap[video.videoId];
-        }
-      }
-
-      persist({
-        ...playlistState,
-        snapshot,
-        progressMap: nextProgressMap,
-        updatedAt: new Date().toISOString(),
-      });
+      const next = await refreshPlaylist(playlistId);
+      setPlaylistState(next);
       toast.success("Playlist data refreshed.");
     } catch (error) {
       const message =
@@ -165,13 +171,21 @@ export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClien
     }
   }
 
+  if (isLoading) {
+    return (
+      <main className="mx-auto min-h-screen max-w-4xl px-6 py-10">
+        <p className="text-muted-foreground">Loading playlist...</p>
+      </main>
+    );
+  }
+
   if (!playlistState || !schedule) {
     return (
       <main className="mx-auto min-h-screen max-w-4xl px-6 py-10">
         <div className="space-y-4">
           <h1 className="text-2xl font-semibold">Playlist not found</h1>
           <p className="text-muted-foreground">
-            This playlist is not currently tracked in local storage.
+            This playlist is not currently tracked on your account.
           </p>
           <Button asChild>
             <Link href="/">
@@ -203,7 +217,11 @@ export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClien
               {playlistState.snapshot.channelTitle}
             </p>
           </div>
-          <Button onClick={refreshPlaylist} variant="outline" disabled={isRefreshing}>
+          <Button
+            onClick={handleRefreshPlaylist}
+            variant="outline"
+            disabled={isRefreshing}
+          >
             <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
             Refresh from YouTube
           </Button>
@@ -255,11 +273,10 @@ export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClien
                 min={1}
                 max={600}
                 value={playlistState.planConfig.minutesPerDay}
-                onChange={(event) =>
-                  updatePlanConfig({
-                    minutesPerDay: Math.max(1, Number(event.target.value)),
-                  })
-                }
+                onChange={(event) => {
+                  const minutesPerDay = Math.max(1, Number(event.target.value));
+                  void applyConfigPatch({ minutesPerDay });
+                }}
                 className="w-full md:w-56"
               />
             </div>
@@ -270,7 +287,9 @@ export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClien
                 type="date"
                 value={playlistState.planConfig.startDate || todayDateValue()}
                 onChange={(event) =>
-                  updatePlanConfig({ startDate: event.target.value || todayDateValue() })
+                  void applyConfigPatch({
+                    startDate: event.target.value || todayDateValue(),
+                  })
                 }
                 className="w-full md:w-56"
               />
@@ -280,7 +299,7 @@ export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClien
               <Select
                 value={String(playlistState.planConfig.playbackSpeed)}
                 onValueChange={(value) =>
-                  updatePlanConfig({
+                  void applyConfigPatch({
                     playbackSpeed: Number(value) as PlaybackSpeed,
                   })
                 }
@@ -297,7 +316,8 @@ export default function PlaylistDetailClient({ playlistId }: PlaylistDetailClien
               </Select>
             </div>
             <Badge variant="outline" className="h-9 px-3 text-xs md:ml-auto">
-              {playlistState.planConfig.minutesPerDay}m/day · {playlistState.planConfig.playbackSpeed}x
+              {playlistState.planConfig.minutesPerDay}m/day ·{" "}
+              {playlistState.planConfig.playbackSpeed}x
             </Badge>
           </div>
         </section>
