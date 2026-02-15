@@ -1,6 +1,6 @@
 # Project Status
 
-Last Updated: 2026-02-14 - Added Fly.io deployment section to README.
+Last Updated: 2026-02-15 - Fixed Fly runtime port mismatch by standardizing production listener on 8080.
 
 ## Current Progress
 - Implemented full MVP web app:
@@ -23,9 +23,12 @@ Last Updated: 2026-02-14 - Added Fly.io deployment section to README.
 - Validation complete: `pnpm lint`, `pnpm test`, `pnpm build`.
 - Added Fly.io deployment artifacts (`Dockerfile`, `.dockerignore`, `fly.toml`) with `yt-dlp` installed in image.
 - Added Fly.io deployment section to README.
+- Fixed Fly connection failures by aligning app runtime to `0.0.0.0:8080` across `fly.toml`, Docker, and `next start` script.
+- Added Fly deployment verification and port-drift troubleshooting notes to README.
 
 ## Blockers / Bugs
 - Requires `yt-dlp` binary available in the runtime environment to import playlists.
+- Pending remote verification: redeploy and confirm Fly health checks pass with no `[PC01] instance refused connection` events.
 
 ## Next Immediate Starting Point
-- Add optional capped concurrency for large batch imports and improve per-item failure visibility in UI.
+- Run `fly deploy` and validate machine health/logs (`fly status`, `fly logs`) show successful routing on port 8080.

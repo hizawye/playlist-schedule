@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-02-15 - Fly port mismatch hotfix
+### Changed
+- Standardized production listener to `0.0.0.0:8080` across Fly service config, Docker image defaults, and runtime start command.
+- Updated README Fly deployment guide with explicit health verification and port-drift troubleshooting steps.
+
 ## 2026-02-14 - Fly.io deployment
 ### Added
 - Docker-based Fly.io deployment artifacts with `yt-dlp` installed in the image.

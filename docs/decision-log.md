@@ -1,5 +1,12 @@
 # Decision Log
 
+## 2026-02-15 - Fly runtime port contract hardening
+**Context:** Fly machines were healthy at process level but unreachable by proxy, with repeated `[PC01] instance refused connection` errors while app logs showed Next listening on port `3000`.
+**Decision:** Standardize production listener to port `8080` across `fly.toml` (`internal_port`), Docker (`PORT`, `EXPOSE`), and runtime startup command (`next start -H 0.0.0.0 -p ${PORT:-8080}`).
+**Rationale:** Removes implicit defaults and prevents future 3000/8080 drift between app runtime and Fly health checks.
+**Consequences:** Local development remains unchanged (`pnpm dev`), but production now has explicit host/port startup guardrails.
+**Alternatives Considered:** Keep `3000` and reconfigure Fly service/machine metadata only.
+
 ## 2026-02-14 - Fly.io deployment
 **Context:** Need a low-cost paid hosting option that can run `yt-dlp` and the Next.js server.
 **Decision:** Use Fly.io with a Docker-based deploy and install `yt-dlp` in the image.
